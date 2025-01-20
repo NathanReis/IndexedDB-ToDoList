@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<link>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TO DOs</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <main class="p-6">
+    <form id="form-task">
+      <label class="form-control">
+        <div class="label">
+          <span class="label-text">ID</span>
+        </div>
+        <input id="form-task-id" class="input input-bordered" type="number" />
+      </label>
+
+      <label class="form-control">
+        <div class="label">
+          <span class="label-text">Title</span>
+        </div>
+        <input id="form-task-title" class="input input-bordered" type="text" required />
+      </label>
+
+      <div class="form-control hidden">
+        <label class="cursor-pointer label">
+          <span class="label-text">Completed?</span>
+          <input id="form-task-completed" type="checkbox" class="checkbox checkbox-success" />
+        </label>
+      </div>
+
+      <button class="btn btn-success btn-sm my-6" type="submit">Save</button>
+      <button class="btn btn-info btn-sm" type="reset">Clear</button>
+    </form>
+
+    <ul id="list-tasks" class="divide-y divide-gray-100 overflow-y-auto h-96"></ul>
+  </main>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="script.js"></script>
+</body>
+</html>
