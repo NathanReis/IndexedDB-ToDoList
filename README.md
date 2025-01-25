@@ -1,6 +1,6 @@
 # IndexedDB - To do list
 
-Uma todo list feita com:
+Uma lista de tarefas feita com:
 
 - HTML;
 - DaisyUI e Tailwind;
