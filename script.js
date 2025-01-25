@@ -334,25 +334,25 @@ const Task = (() => {
 const tasksList = (() => {
   const LIST_ITEM_ID_PREFIX = 'list_task_';
 
-  const list = document.getElementById('list-tasks');
+  const list = document.querySelector('#list-tasks');
 
   function buildItem({ object }) {
-    const itemTemplate = document.getElementById('list-task-item-template');
+    const itemTemplate = document.querySelector('#list-task-item-template');
     const itemClone = itemTemplate.content.cloneNode(true);
 
     const newItem = itemClone.firstElementChild;
     newItem.id = newItem.id.replace('{{taskId}}', object.id);
 
-    const titleElement = newItem.getElementsByClassName('list-task-title')[0];
+    const titleElement = newItem.querySelector('.list-task-title');
     titleElement.textContent = titleElement.textContent
       .replace('{{taskId}}', object.id)
       .replace('{{taskTitle}}', object.title);
 
-    const createdAtElement = newItem.getElementsByClassName('list-task-created-at')[0];
+    const createdAtElement = newItem.querySelector('.list-task-created-at');
     createdAtElement.textContent = createdAtElement.textContent
       .replace('{{taskCreatedAt}}', formatDate(object.created_at));
 
-    const updatedAtElement = newItem.getElementsByClassName('list-task-updated-at')[0];
+    const updatedAtElement = newItem.querySelector('.list-task-updated-at');
 
     if (object.updated_at) {
       updatedAtElement.textContent = updatedAtElement.textContent
@@ -361,7 +361,7 @@ const tasksList = (() => {
       updatedAtElement.remove();
     }
 
-    const completedAtElement = newItem.getElementsByClassName('list-task-completed-at')[0];
+    const completedAtElement = newItem.querySelector('.list-task-completed-at');
 
     if (object.completed_at) {
       completedAtElement.textContent = completedAtElement.textContent
@@ -384,13 +384,13 @@ const tasksList = (() => {
 
     updateItem(object) {
       const id = object.id;
-      const item = document.getElementById(`${LIST_ITEM_ID_PREFIX}${id}`);
+      const item = document.querySelector(`#${LIST_ITEM_ID_PREFIX}${id}`);
 
       item.replaceWith(buildItem({ object }));
     },
 
     deleteItem(id) {
-      const item = document.getElementById(`${LIST_ITEM_ID_PREFIX}${id}`);
+      const item = document.querySelector(`#${LIST_ITEM_ID_PREFIX}${id}`);
       list.removeChild(item);
     },
 
@@ -401,7 +401,7 @@ const tasksList = (() => {
 })();
 
 const handleFormReset = (() => {
-  const completedContainer = document.getElementById('form-task-completed').closest('.form-control');
+  const completedContainer = document.querySelector('#form-task-completed').closest('.form-control');
   const submitBtn = document.querySelector('#form-task button[type="submit"]');
 
   return (event) => {
@@ -413,7 +413,7 @@ const handleFormReset = (() => {
 })();
 
 const handleTaskSubmit = (() => {
-  const form = document.getElementById('form-task');
+  const form = document.querySelector('#form-task');
   const idInput = form.querySelector('#form-task-id');
   const titleInput = form.querySelector('#form-task-title');
   const completedInput = form.querySelector('#form-task-completed');
@@ -473,7 +473,7 @@ const handleTaskSubmit = (() => {
 
 const handleIdChange = (() => {
   const submitBtn = document.querySelector('#form-task button[type="submit"]');
-  const completedContainer = document.getElementById('form-task-completed').closest('.form-control');
+  const completedContainer = document.querySelector('#form-task-completed').closest('.form-control');
 
   return (event) => {
     if (event.target.value) {
@@ -512,7 +512,7 @@ const handleDeleteClick = (() => {
 
 const handleUpdateClick = (() => {
   function afterSuccess({ result }) {
-    const idInput = document.getElementById('form-task-id');
+    const idInput = document.querySelector('#form-task-id');
     idInput.value = result.id;
 
     const inputEvent = new InputEvent('input', {
@@ -521,8 +521,8 @@ const handleUpdateClick = (() => {
     });
     idInput.dispatchEvent(inputEvent);
 
-    document.getElementById('form-task-title').value = result.title;
-    document.getElementById('form-task-completed').checked = !!result.completed_at;
+    document.querySelector('#form-task-title').value = result.title;
+    document.querySelector('#form-task-completed').checked = !!result.completed_at;
   }
 
   return (event) => {
@@ -545,9 +545,9 @@ const handleUpdateClick = (() => {
 window.addEventListener('load', () => {
   DB.startConnection();
 
-  document.getElementById('form-task').addEventListener('reset', handleFormReset)
-  document.getElementById('form-task').addEventListener('submit', handleTaskSubmit);
-  document.getElementById('form-task-id').addEventListener('input', handleIdChange);
+  document.querySelector('#form-task').addEventListener('reset', handleFormReset)
+  document.querySelector('#form-task').addEventListener('submit', handleTaskSubmit);
+  document.querySelector('#form-task-id').addEventListener('input', handleIdChange);
   document.addEventListener('click', handleDeleteClick);
   document.addEventListener('click', handleUpdateClick);
 });
