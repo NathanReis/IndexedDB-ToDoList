@@ -336,20 +336,41 @@ const tasksList = (() => {
 
   const list = document.getElementById('list-tasks');
 
-  function printTitle({ span, object }) {
-    span.textContent = `#${object.id} - ${object.title}`;
-  }
+  function buildItem({ object }) {
+    const itemTemplate = document.getElementById('list-task-item-template');
+    const itemClone = itemTemplate.content.cloneNode(true);
 
-  function printCreatedAt({ span, object }) {
-    span.textContent = `Created at: ${formatDate(object.created_at)}`;
-  }
+    const newItem = itemClone.firstElementChild;
+    newItem.id = newItem.id.replace('{{taskId}}', object.id);
 
-  function printUpdatedAt({ span, object }) {
-    span.textContent = `Updated at: ${formatDate(object.updated_at)}`;
-  }
+    const titleElement = newItem.getElementsByClassName('list-task-title')[0];
+    titleElement.textContent = titleElement.textContent
+      .replace('{{taskId}}', object.id)
+      .replace('{{taskTitle}}', object.title);
 
-  function printCompletedAt({ span, object }) {
-    span.textContent = `Completed at: ${formatDate(object.completed_at)}`;
+    const createdAtElement = newItem.getElementsByClassName('list-task-created-at')[0];
+    createdAtElement.textContent = createdAtElement.textContent
+      .replace('{{taskCreatedAt}}', formatDate(object.created_at));
+
+    const updatedAtElement = newItem.getElementsByClassName('list-task-updated-at')[0];
+
+    if (object.updated_at) {
+      updatedAtElement.textContent = updatedAtElement.textContent
+        .replace('{{taskUpdatedAt}}', formatDate(object.updated_at));
+    } else {
+      updatedAtElement.remove();
+    }
+
+    const completedAtElement = newItem.getElementsByClassName('list-task-completed-at')[0];
+
+    if (object.completed_at) {
+      completedAtElement.textContent = completedAtElement.textContent
+        .replace('{{taskCompletedAt}}', formatDate(object.completed_at));
+    } else {
+      completedAtElement.remove();
+    }
+
+    return itemClone;
   }
 
   function formatDate(date) {
@@ -358,89 +379,14 @@ const tasksList = (() => {
 
   return Object.freeze({
     createNewItem(object) {
-      const newItem = document.createElement('li');
-      newItem.id = `${LIST_ITEM_ID_PREFIX}${object.id}`;
-      newItem.classList.add('list-task', 'flex', 'flex-row', 'p-4');
-
-      const dataContainer = document.createElement('div');
-      dataContainer.classList.add('list-task-data', 'flex', 'flex-col', 'flex-grow');
-      newItem.appendChild(dataContainer);
-
-      const titleSpan = document.createElement('span');
-      titleSpan.classList.add('list-task-title');
-      printTitle({ span: titleSpan, object });
-      dataContainer.appendChild(titleSpan);
-
-      const createdAtSpan = document.createElement('span');
-      createdAtSpan.classList.add('list-task-created-at');
-      printCreatedAt({ span: createdAtSpan, object });
-      dataContainer.appendChild(createdAtSpan);
-
-      if (object.updated_at) {
-        const updatedAtSpan = document.createElement('span');
-        updatedAtSpan.classList.add('list-task-updated-at');
-        printUpdatedAt({ span: updatedAtSpan, object });
-        dataContainer.appendChild(updatedAtSpan);
-      }
-
-      if (object.completed_at) {
-        const completedAtSpan = document.createElement('span');
-        completedAtSpan.classList.add('list-task-completed-at');
-        printCompletedAt({ span: completedAtSpan, object });
-        dataContainer.appendChild(completedAtSpan);
-      }
-
-      const btnsContainer = document.createElement('div');
-      btnsContainer.classList.add('flex', 'flex-col', 'gap-2', 'justify-center', 'items-center');
-      newItem.appendChild(btnsContainer);
-
-      const editButton = document.createElement('button');
-      editButton.classList.add('btn-edit', 'btn', 'btn-warning', 'btn-sm');
-      editButton.textContent = 'Edit';
-      btnsContainer.appendChild(editButton);
-
-      const deleteButton = document.createElement('button');
-      deleteButton.classList.add('btn-delete', 'btn', 'btn-error', 'btn-sm');
-      deleteButton.textContent = 'Delete';
-      btnsContainer.appendChild(deleteButton);
-
-      list.appendChild(newItem);
+      list.appendChild(buildItem({ object }));
     },
 
     updateItem(object) {
       const id = object.id;
       const item = document.getElementById(`${LIST_ITEM_ID_PREFIX}${id}`);
-      const dataContainer = item.getElementsByClassName('list-task-data')[0];
 
-      const titleSpan = item.getElementsByClassName('list-task-title')[0];
-      printTitle({ span: titleSpan, object });
-
-      const createdAtSpan = item.getElementsByClassName('list-task-created-at')[0];
-      printCreatedAt({ span: createdAtSpan, object });
-
-      let updatedAtSpan = item.getElementsByClassName('list-task-updated-at')[0];
-
-      if (!updatedAtSpan) {
-        updatedAtSpan = document.createElement('span');
-        updatedAtSpan.classList.add('list-task-updated-at');
-      }
-
-      printUpdatedAt({ span: updatedAtSpan, object });
-      dataContainer.appendChild(updatedAtSpan);
-
-      let completedAtSpan = item.getElementsByClassName('list-task-completed-at')[0];
-
-      if (object.completed_at) {
-        if (!completedAtSpan) {
-          completedAtSpan = document.createElement('span');
-          completedAtSpan.classList.add('list-task-completed-at');
-        }
-
-        printCompletedAt({ span: completedAtSpan, object });
-        dataContainer.appendChild(completedAtSpan);
-      } else if (completedAtSpan) {
-        dataContainer.removeChild(completedAtSpan);
-      }
+      item.replaceWith(buildItem({ object }));
     },
 
     deleteItem(id) {
