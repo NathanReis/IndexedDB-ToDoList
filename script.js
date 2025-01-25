@@ -414,6 +414,9 @@ const handleFormReset = (() => {
 
 const handleTaskSubmit = (() => {
   const form = document.getElementById('form-task');
+  const idInput = form.querySelector('#form-task-id');
+  const titleInput = form.querySelector('#form-task-title');
+  const completedInput = form.querySelector('#form-task-completed');
 
   function afterSuccessCreate(object, { event }) {
     object.id = event.target.result;
@@ -430,9 +433,9 @@ const handleTaskSubmit = (() => {
   return (event) => {
     event.preventDefault();
 
-    const id = Number(document.getElementById('form-task-id').value);
-    const title = document.getElementById('form-task-title').value.trim();
-    const completed = document.getElementById('form-task-completed').checked;
+    const id = Number(idInput.value);
+    const title = titleInput.value.trim();
+    const completed = completedInput.checked;
 
     if (!title) {
       throw new Error('title is required');
