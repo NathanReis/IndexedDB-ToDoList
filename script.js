@@ -2,11 +2,19 @@ const DB = (() => {
   const DB_NAME = 'todo_list';
   const DB_VERSION = 1;
 
+  const STATUSES = Object.freeze({
+    in_progress: 'in progress',
+    error: 'error',
+    complete: 'complete',
+  });
+
   function init() {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onerror = (event) => {
       console.error('DB: failed to open connection', event);
+
+      currentStatus = STATUSES.error;
     };
 
     request.onupgradeneeded = (event) => {
@@ -25,6 +33,8 @@ const DB = (() => {
       }
 
       printAllTasks();
+
+      currentStatus = STATUSES.complete;
     };
   }
 
@@ -44,6 +54,7 @@ const DB = (() => {
   }
 
   let connection;
+  let currentStatus;
 
   return Object.freeze({
     startConnection() {
@@ -51,13 +62,19 @@ const DB = (() => {
     },
 
     getConnection() {
-      if (!connection) {
-        console.log('Opening connection...');
+      if (connection) {
+        return connection;
+      }
+
+      if (!currentStatus) {
+        currentStatus = STATUSES.in_progress;
 
         init();
       }
 
-      return connection;
+      if (currentStatus === STATUSES.in_progress) {
+        console.log('Opening connection...');
+      }
     },
   });
 })();
