@@ -331,6 +331,81 @@ const Task = (() => {
   });
 })();
 
+const taskForm = (() => {
+  const form = document.querySelector('#form-task');
+  const idInput = form.querySelector('#form-task-id');
+  const titleInput = form.querySelector('#form-task-title');
+  const completedInput = form.querySelector('#form-task-completed');
+  const completedContainer = completedInput.closest('.form-control');
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  function getId() {
+    return Number(idInput.value);
+  }
+
+  function getTitle() {
+    return titleInput.value.trim();
+  }
+
+  function toggleToCreate() {
+    completedContainer.classList.add('hidden');
+    submitBtn.classList.add('btn-success');
+    submitBtn.classList.remove('btn-warning');
+  }
+
+  function toggleToEdit() {
+    completedContainer.classList.remove('hidden');
+    submitBtn.classList.add('btn-warning');
+    submitBtn.classList.remove('btn-success');
+  }
+
+  return Object.freeze({
+    toggleCreateOrEdit(id) {
+      if (id === undefined) {
+        id = getId();
+      }
+
+      if (id) {
+        toggleToEdit();
+      } else {
+        toggleToCreate();
+      }
+    },
+
+    extractData() {
+      const id = getId();
+      const title = getTitle();
+      const completed = completedInput.checked;
+
+      const object = { title };
+
+      if (id) {
+        object.id = id;
+      }
+
+      if (completed) {
+        object.completed_at = new Date().toISOString();
+      } else {
+        object.completed_at = null;
+      }
+
+      return object;
+    },
+
+    fillData({ object }) {
+      idInput.value = object.id;
+      titleInput.value = object.title;
+      completedInput.checked = !!object.completed_at;
+
+      toggleToEdit();
+    },
+
+    reset() {
+      form.reset();
+    },
+  });
+})();
+
 const tasksList = (() => {
   const LIST_ITEM_ID_PREFIX = 'list_task_';
 
@@ -400,56 +475,33 @@ const tasksList = (() => {
   });
 })();
 
-const handleFormReset = (() => {
-  const completedContainer = document.querySelector('#form-task-completed').closest('.form-control');
-  const submitBtn = document.querySelector('#form-task button[type="submit"]');
-
-  return (event) => {
-    submitBtn.classList.add('btn-success');
-    submitBtn.classList.remove('btn-warning');
-
-    completedContainer.classList.add('hidden');
-  };
-})();
+const handleFormReset = (event) => {
+  taskForm.toggleCreateOrEdit(null);
+};
 
 const handleTaskSubmit = (() => {
-  const form = document.querySelector('#form-task');
-  const idInput = form.querySelector('#form-task-id');
-  const titleInput = form.querySelector('#form-task-title');
-  const completedInput = form.querySelector('#form-task-completed');
-
   function afterSuccessCreate(object, { event }) {
     object.id = event.target.result;
 
     tasksList.createNewItem(object);
-    form.reset();
+    taskForm.reset();
   }
 
   function afterSuccessUpdate(object, params) {
     tasksList.updateItem(object);
-    form.reset();
+    taskForm.reset();
   }
 
   return (event) => {
     event.preventDefault();
 
-    const id = Number(idInput.value);
-    const title = titleInput.value.trim();
-    const completed = completedInput.checked;
+    const object = taskForm.extractData();
 
-    if (!title) {
+    if (!object.title) {
       throw new Error('title is required');
     }
 
-    const object = { title };
-
-    if (id) object.id = id;
-
-    if (completed) {
-      object.completed_at = new Date().toISOString();
-    } else {
-      object.completed_at = null;
-    }
+    const id = object.id;
 
     if (id) {
       Task.update({
@@ -471,22 +523,9 @@ const handleTaskSubmit = (() => {
   };
 })();
 
-const handleIdChange = (() => {
-  const submitBtn = document.querySelector('#form-task button[type="submit"]');
-  const completedContainer = document.querySelector('#form-task-completed').closest('.form-control');
-
-  return (event) => {
-    if (event.target.value) {
-      submitBtn.classList.add('btn-warning');
-      submitBtn.classList.remove('btn-success');
-      completedContainer.classList.remove('hidden');
-    } else {
-      submitBtn.classList.add('btn-success');
-      submitBtn.classList.remove('btn-warning');
-      completedContainer.classList.add('hidden');
-    }
-  };
-})();
+const handleIdChange = (event) => {
+  taskForm.toggleCreateOrEdit(event.target.value);
+};
 
 const handleDeleteClick = (() => {
   function afterSuccess(id) {
@@ -512,17 +551,7 @@ const handleDeleteClick = (() => {
 
 const handleUpdateClick = (() => {
   function afterSuccess({ result }) {
-    const idInput = document.querySelector('#form-task-id');
-    idInput.value = result.id;
-
-    const inputEvent = new InputEvent('input', {
-      bubbles: true,
-      cancelable: true,
-    });
-    idInput.dispatchEvent(inputEvent);
-
-    document.querySelector('#form-task-title').value = result.title;
-    document.querySelector('#form-task-completed').checked = !!result.completed_at;
+    taskForm.fillData({ object: result });
   }
 
   return (event) => {
