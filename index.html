@@ -36,7 +36,17 @@
       <button class="btn btn-info btn-sm" type="reset">Clear</button>
     </form>
 
-    <ul id="list-tasks" class="divide-y divide-gray-100 overflow-y-auto h-96"></ul>
+    <div role="tablist" class="tabs tabs-bordered">
+      <input class="tab" type="radio" name="list-tasks-tab" checked role="tab" aria-label="To do" />
+      <div role="tabpanel" class="tab-content">
+        <ul id="list-uncompleted-tasks" class="list-tasks divide-y divide-gray-100 overflow-y-auto h-96"></ul>
+      </div>
+
+      <input class="tab" type="radio" name="list-tasks-tab" role="tab" aria-label="Completed" />
+      <div role="tabpanel" class="tab-content">
+        <ul id="list-completed-tasks" class="list-tasks divide-y divide-gray-100 overflow-y-auto h-96"></ul>
+      </div>
+    </div>
 
     <template id="list-task-item-template">
       <li id="list_task_{{taskId}}" class="list-task flex flex-row items-center gap-4 py-4">

@@ -409,7 +409,8 @@ const taskForm = (() => {
 const tasksList = (() => {
   const LIST_ITEM_ID_PREFIX = 'list_task_';
 
-  const list = document.querySelector('#list-tasks');
+  const uncompletedList = document.querySelector('#list-uncompleted-tasks');
+  const completedList = document.querySelector('#list-completed-tasks');
 
   function buildItem({ object }) {
     const itemTemplate = document.querySelector('#list-task-item-template');
@@ -458,19 +459,27 @@ const tasksList = (() => {
 
   return Object.freeze({
     createNewItem(object) {
-      list.appendChild(buildItem({ object }));
+      const newItem = buildItem({ object });
+      const targetList = object.completed_at ? completedList : uncompletedList;
+
+      targetList.appendChild(newItem);
     },
 
     updateItem(object) {
       const id = object.id;
       const item = document.querySelector(`#${LIST_ITEM_ID_PREFIX}${id}`);
+      const newItem = buildItem({ object });
 
-      item.replaceWith(buildItem({ object }));
+      item.remove();
+
+      const targetList = object.completed_at ? completedList : uncompletedList;
+
+      targetList.appendChild(newItem);
     },
 
     deleteItem(id) {
       const item = document.querySelector(`#${LIST_ITEM_ID_PREFIX}${id}`);
-      list.removeChild(item);
+      item.remove();
     },
 
     extractItemId(item) {
@@ -539,7 +548,7 @@ const handleDeleteClick = (() => {
   return (event) => {
     const btn = event.target;
 
-    if (!btn.matches('#list-tasks .btn-delete')) return;
+    if (!btn.matches('.list-tasks .btn-delete')) return;
 
     event.stopPropagation();
 
@@ -561,7 +570,7 @@ const handleUpdateClick = (() => {
   return (event) => {
     const btn = event.target;
 
-    if (!btn.matches('#list-tasks .btn-edit')) return;
+    if (!btn.matches('.list-tasks .btn-edit')) return;
 
     event.stopPropagation();
 
@@ -583,7 +592,7 @@ const handleCompleteClick = (() => {
   return (event) => {
     const checkbox = event.target;
 
-    if (!checkbox.matches('#list-tasks .list-task-completed')) return;
+    if (!checkbox.matches('.list-tasks .list-task-completed')) return;
 
     event.stopPropagation();
 
