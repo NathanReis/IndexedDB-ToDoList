@@ -39,7 +39,8 @@
     <ul id="list-tasks" class="divide-y divide-gray-100 overflow-y-auto h-96"></ul>
 
     <template id="list-task-item-template">
-      <li id="list_task_{{taskId}}" class="list-task flex flex-row p-4">
+      <li id="list_task_{{taskId}}" class="list-task flex flex-row items-center gap-4 py-4">
+        <input class="list-task-completed checkbox checkbox-success checkbox-lg" type="checkbox" />
         <div class="list-task-data flex flex-col flex-grow">
           <span class="list-task-title">#{{taskId}} - {{taskTitle}}</span>
           <span class="list-task-created-at">Created at: {{taskCreatedAt}}</span>

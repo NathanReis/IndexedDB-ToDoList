@@ -418,10 +418,14 @@ const tasksList = (() => {
     const newItem = itemClone.firstElementChild;
     newItem.id = newItem.id.replace('{{taskId}}', object.id);
 
+    const checkbox = newItem.querySelector('.list-task-completed');
+    checkbox.checked = !!object.completed_at;
+
     const titleElement = newItem.querySelector('.list-task-title');
     titleElement.textContent = titleElement.textContent
       .replace('{{taskId}}', object.id)
       .replace('{{taskTitle}}', object.title);
+    titleElement.classList.toggle('line-through', !!object.completed_at);
 
     const createdAtElement = newItem.querySelector('.list-task-created-at');
     createdAtElement.textContent = createdAtElement.textContent
@@ -571,6 +575,36 @@ const handleUpdateClick = (() => {
   }
 })();
 
+const handleCompleteClick = (() => {
+  function afterSuccess({ result }) {
+    tasksList.updateItem(result);
+  }
+
+  return (event) => {
+    const checkbox = event.target;
+
+    if (!checkbox.matches('#list-tasks .list-task-completed')) return;
+
+    event.stopPropagation();
+
+    const listItem = checkbox.closest('.list-task');
+    const id = Number(tasksList.extractItemId(listItem));
+
+    Task.update({
+      key: id,
+      object: {
+        completed_at: checkbox.checked ? new Date().toISOString() : null,
+      },
+      successCallback() {
+        Task.findByKey({
+          key: id,
+          successCallback({ result }) { afterSuccess({ result }) },
+        });
+      },
+    });
+  }
+})();
+
 window.addEventListener('load', () => {
   DB.startConnection();
 
@@ -579,4 +613,5 @@ window.addEventListener('load', () => {
   document.querySelector('#form-task-id').addEventListener('input', handleIdChange);
   document.addEventListener('click', handleDeleteClick);
   document.addEventListener('click', handleUpdateClick);
+  document.addEventListener('click', handleCompleteClick);
 });
